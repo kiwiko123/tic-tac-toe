@@ -1,1 +1,1 @@
-# java-tools
+# tic-tac-toe
