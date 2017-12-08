@@ -1,5 +1,11 @@
+package game;
 import java.util.HashSet;
 import java.util.Set;
+
+import state.GameState;
+import state.GameTreeNode;
+import state.MinMaxGameTreeNode;
+import state.Player;
 
 
 public class ComputerPlayer extends Player {
@@ -37,13 +43,14 @@ public class ComputerPlayer extends Player {
 	 * @return the Pair representing its next move; in the format (row, column)
 	 */
 	public Pair getNextMove(Board board) {
-		// minimax search from currentNode
-		GameTreeNode root = buildGameTree(GameTreeNode.AdversaryType.MAX, board, getId());
-		miniMaxSearch(root);
+		// min-max search from currentNode
+		TicTacToeGameTreeNode root = buildGameTree(MinMaxGameTreeNode.AdversaryType.MAX, board, getId());
+		minMaxSearch(root);
 		
-		GameTreeNode maxChild = null;
+		TicTacToeGameTreeNode maxChild = null;
 		int maxScore = Integer.MIN_VALUE;
-		for (GameTreeNode child : root.getChildren()) {
+		for (GameTreeNode abstractChild : root.getChildren()) {
+			TicTacToeGameTreeNode child = (TicTacToeGameTreeNode)abstractChild;
 			if (child.getRank() > maxScore) {
 				maxScore = child.getRank();
 				maxChild = child;
@@ -62,7 +69,7 @@ public class ComputerPlayer extends Player {
 	 * @param current root of the min-max game tree
 	 * @return the integer representation of the score from current's perspective
 	 */
-	private int miniMaxSearch(GameTreeNode current) {
+	private int minMaxSearch(TicTacToeGameTreeNode current) {
 		GameState state = current.getState();
 		if (state.terminal()) {
 			int score = state.utility(this);
@@ -71,30 +78,34 @@ public class ComputerPlayer extends Player {
 		}
 		
 		int optimalResult;
-		if (current.getAdversaryType() == GameTreeNode.AdversaryType.MAX) {
+		if (current.getAdversaryType() == TicTacToeGameTreeNode.AdversaryType.MAX) {
 			optimalResult = Integer.MIN_VALUE;
-			for (GameTreeNode child : current.getChildren()) {
-				int v = miniMaxSearch(child);
+			for (GameTreeNode abstractChild : current.getChildren()) {
+				TicTacToeGameTreeNode child = (TicTacToeGameTreeNode)abstractChild;
+				int v = minMaxSearch(child);
 				if (v > optimalResult) {
 					current.setRank(current.getRank() + child.getRank());	
 				}
 				optimalResult = Math.max(optimalResult, v);
 			}
-			for (GameTreeNode child : current.getChildren()) {
+			for (GameTreeNode abstractChild : current.getChildren()) {
+				TicTacToeGameTreeNode child = (TicTacToeGameTreeNode)abstractChild;
 				int maxScore = Math.max(current.getRank(), child.getRank());
 				current.setRank(maxScore);
 			}
 		}
 		else {
 			optimalResult = Integer.MAX_VALUE;
-			for (GameTreeNode child : current.getChildren()) {
-				int v = miniMaxSearch(child);
+			for (GameTreeNode abstractChild : current.getChildren()) {
+				TicTacToeGameTreeNode child = (TicTacToeGameTreeNode)abstractChild;
+				int v = minMaxSearch(child);
 				if (v < optimalResult) {
 					current.setRank(current.getRank() + child.getRank());	
 				}
 				optimalResult = Math.min(optimalResult, v);
 			}
-			for (GameTreeNode child : current.getChildren()) {
+			for (GameTreeNode abstractChild : current.getChildren()) {
+				TicTacToeGameTreeNode child = (TicTacToeGameTreeNode)abstractChild;
 				int minScore = Math.min(current.getRank(), child.getRank());
 				current.setRank(minScore);
 			}
@@ -114,8 +125,8 @@ public class ComputerPlayer extends Player {
 	 * @param player top-level player, whose current turn it is
 	 * @return the root of the game tree
 	 */
-	private GameTreeNode buildGameTree(GameTreeNode.AdversaryType adversaryType, Board currentBoard, String player) {
-		GameTreeNode node = new GameTreeNode(currentBoard, adversaryType);
+	private TicTacToeGameTreeNode buildGameTree(TicTacToeGameTreeNode.AdversaryType adversaryType, Board currentBoard, String player) {
+		TicTacToeGameTreeNode node = new TicTacToeGameTreeNode(currentBoard, adversaryType);
 		
 		if (!currentBoard.terminal()) {
 			Set<Pair> remainingLocations = generateRemainingLocations(currentBoard);
@@ -126,8 +137,8 @@ public class ComputerPlayer extends Player {
 				Board copy = new Board(currentBoard);
 				copy.place(row, col, player);
 				String otherPlayer = Board.getOtherPlayer(player);
-				GameTreeNode.AdversaryType otherType = GameTreeNode.reverseAdversaryType(adversaryType);
-				GameTreeNode child = buildGameTree(otherType, copy, otherPlayer);
+				TicTacToeGameTreeNode.AdversaryType otherType = TicTacToeGameTreeNode.reverseAdversaryType(adversaryType);
+				TicTacToeGameTreeNode child = buildGameTree(otherType, copy, otherPlayer);
 				child.setMove(row, col);
 				node.addChild(child);
 			}

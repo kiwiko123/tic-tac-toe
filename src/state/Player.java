@@ -1,3 +1,4 @@
+package state;
 
 public abstract class Player {
 	private final String id;

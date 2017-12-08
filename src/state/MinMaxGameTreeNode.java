@@ -1,7 +1,10 @@
+package state;
+
 import java.util.LinkedList;
 import java.util.List;
 
-public class GameTreeNode {
+
+public abstract class MinMaxGameTreeNode implements GameTreeNode {
 	
 	public static enum AdversaryType {
 		MIN,
@@ -28,20 +31,16 @@ public class GameTreeNode {
 	private GameState state;
 	private AdversaryType adversaryType;
 	private List<GameTreeNode> children;
-	private Pair move;
-	private int rank;
 	
-	public GameTreeNode(GameState state, AdversaryType adversaryType) {
+	public MinMaxGameTreeNode(GameState state, AdversaryType adversaryType) {
 		this.state = state;
 		this.adversaryType = adversaryType;
 		children = new LinkedList<>();
-		move = new Pair(-1, -1);
-		rank = 0;
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("GameTreeNode(%s, rank=%d, player=%s)", getState().toString(), getRank(), getAdversaryType().toString());
+		return String.format("GameTreeNode(%s, player=%s)", getState().toString(), getAdversaryType().toString());
 	}
 
 	public GameState getState() {
@@ -58,22 +57,5 @@ public class GameTreeNode {
 
 	public AdversaryType getAdversaryType() {
 		return adversaryType;
-	}
-	
-	public Pair getMove() {
-		return move;
-	}
-	
-	public void setMove(int row, int col) {
-		move.setFirst(row);
-		move.setSecond(col);
-	}
-
-	public int getRank() {
-		return rank;
-	}
-
-	public void setRank(int rank) {
-		this.rank = rank;
 	}
 }

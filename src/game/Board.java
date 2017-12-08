@@ -1,5 +1,9 @@
+package game;
 import java.util.ArrayList;
 import java.util.List;
+
+import state.GameState;
+import state.Player;
 
 public class Board implements GameState {
 	public static final String EMPTY = " ";
